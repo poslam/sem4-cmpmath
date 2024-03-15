@@ -3,24 +3,23 @@ from sympy import cos, diff, lambdify, symbols
 
 x, y = symbols("x y")
 
-## var 24
+var = 24
 
-def f(x):
-    return x / 2 - cos(x)
+if var == 24:
 
+    def f(x):
+        return x / 2 - cos(x)
 
-nums = [0.64, 0.42, 0.87, 0.63]
-a, b = 0.4, 0.9
+    nums = [0.64, 0.42, 0.87, 0.63]
+    a, b = 0.4, 0.9
 
+elif var == 15:
 
-## var 15
+    def f(x):
+        return 2 * x - cos(x)
 
-# def f(x):
-#     return 2 * x - cos(x)
-
-
-# nums = [0.44, 0.13, 0.58, 0.37]
-# a, b = 0.1, 0.6
+    nums = [0.44, 0.13, 0.58, 0.37]
+    a, b = 0.1, 0.6
 
 
 steps = 10
@@ -28,6 +27,15 @@ h = (b - a) / steps
 points = [round(a + h * i, 10) for i in range(steps + 1)]
 
 result = []
+
+
+def div_sub_2(x1, x2, f):
+    return f(x2) - f(x1) / (x2 - x1)
+
+
+def div_sub_3(x1, x2, x3, f):
+    return (div_sub_2(x2, x3, f) - div_sub_2(x1, x2, f)) / (x3 - x1)
+
 
 for num in nums:
     for i in range(len(points) - 1):
@@ -40,19 +48,21 @@ for num in nums:
             next = (i + 1, points[i + 1])
             break
 
+    ran = [prev[1], cur[1], next[1]]
+
     # l1
 
-    l1 = (f(cur[1]) * (num - next[1]) / (cur[1] - next[1])) + (
-        f(next[1]) * (num - cur[1]) / (next[1] - cur[1])
+    l1 = (f(ran[1]) * (num - ran[2]) / (ran[1] - ran[2])) + (
+        f(ran[2]) * (num - ran[1]) / (ran[2] - ran[1])
     )
 
     # r1
 
     r1_func = lambdify(
-        x, expr=(0.5 * diff(f(x), x, 2)) * (num - cur[1]) * (num - next[1])
+        x, expr=(0.5 * diff(f(x), x, 2)) * (num - ran[1]) * (num - ran[2])
     )
 
-    local_interv = np.arange(cur[1], next[1], 10e-4)
+    local_interv = np.arange(ran[1], ran[2], 10e-6)
     vals = []
 
     for point in local_interv:
@@ -70,16 +80,16 @@ for num in nums:
 
     l2 = (
         (
-            (f(prev[1]) * (num - cur[1]) * (num - next[1]))
-            / ((prev[1] - cur[1]) * (prev[1] - next[1]))
+            (f(ran[0]) * (num - ran[1]) * (num - ran[2]))
+            / ((ran[0] - ran[1]) * (ran[0] - ran[2]))
         )
         + (
-            (f(cur[1]) * (num - prev[1]) * (num - next[1]))
-            / ((cur[1] - prev[1]) * (cur[1] - next[1]))
+            (f(ran[1]) * (num - ran[0]) * (num - ran[2]))
+            / ((ran[1] - ran[0]) * (ran[1] - ran[2]))
         )
         + (
-            (f(next[1]) * (num - prev[1]) * (num - cur[1]))
-            / ((next[1] - prev[1]) * (next[1] - cur[1]))
+            (f(ran[2]) * (num - ran[0]) * (num - ran[1]))
+            / ((ran[2] - ran[0]) * (ran[2] - ran[1]))
         )
     )
 
@@ -88,10 +98,10 @@ for num in nums:
     r2_func = lambdify(
         x,
         expr=(1 / 6 * diff(f(x), x, 3))
-        * ((num - prev[1]) * (num - cur[1]) * (num - next[1])),
+        * ((num - ran[0]) * (num - ran[1]) * (num - ran[2])),
     )
 
-    local_interv = np.arange(prev[1], next[1], 10e-4)
+    local_interv = np.arange(ran[0], ran[2], 10e-6)
     vals = []
 
     for point in local_interv:
@@ -107,31 +117,29 @@ for num in nums:
 
     # n1
 
-    n1 = f(cur[1]) + (f(cur[1]) - f(next[1]) / (cur[1] - next[1])) * (num - cur[1])
+    n1 = f(ran[1]) + div_sub_2(ran[1], ran[2], f) * (num - ran[1])
 
     # n2
 
     n2 = (
-        f(prev[1])
-        + (f(prev[1]) - f(cur[1]) / (prev[1] - cur[1])) * (num - prev[1])
-        + (
-            (f(prev[1]) + f(cur[1]) + f(next[1]))
-            / (
-                (prev[1] - cur[1])
-                * (prev[1] - next[1])
-                * (cur[1] - prev[1])
-                * (cur[1] - next[1])
-                * (next[1] - cur[1])
-                * (next[1] - prev[1])
-            )
-        )
-        * (num - prev[1])
-        * (num - cur[1])
+        f(ran[0])
+        + div_sub_2(ran[0], ran[1], f) * (num - ran[0])
+        + div_sub_3(*ran, f) * (num - ran[0]) * (num - ran[1])
     )
 
     # result
 
-    num_res = {num: {"l1": l1, "r1": r1, "n1": n1, "l2": l2, "r2": r2, "n2": n2}}
+    num_res = {
+        num: {
+            "f(num)": f(num),
+            "l1": l1,
+            "r1": r1,
+            "n1": n1,
+            "l2": l2,
+            "r2": r2,
+            "n2": n2,
+        }
+    }
 
     result.append(num_res)
 
