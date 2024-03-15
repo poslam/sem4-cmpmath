@@ -1,29 +1,31 @@
-# 24
-
 import numpy as np
 from sympy import cos, diff, lambdify, symbols
 
 x, y = symbols("x y")
 
-basic_precision = 10
-
+## var 24
 
 def f(x):
     return x / 2 - cos(x)
 
 
-def dif(func, deg=1):
-    for _ in range(deg):
-        func = diff(func)
-    return func
-
-
 nums = [0.64, 0.42, 0.87, 0.63]
 a, b = 0.4, 0.9
-steps = 10
 
+
+## var 15
+
+# def f(x):
+#     return 2 * x - cos(x)
+
+
+# nums = [0.44, 0.13, 0.58, 0.37]
+# a, b = 0.1, 0.6
+
+
+steps = 10
 h = (b - a) / steps
-points = [round(a + h * i, basic_precision) for i in range(steps + 1)]
+points = [round(a + h * i, 10) for i in range(steps + 1)]
 
 result = []
 
@@ -46,7 +48,9 @@ for num in nums:
 
     # r1
 
-    r1_func = lambdify(x, expr=(0.5 * dif(f(x), 2)) * (num - cur[1]) * (num - next[1]))
+    r1_func = lambdify(
+        x, expr=(0.5 * diff(f(x), x, 2)) * (num - cur[1]) * (num - next[1])
+    )
 
     local_interv = np.arange(cur[1], next[1], 10e-4)
     vals = []
@@ -54,7 +58,7 @@ for num in nums:
     for point in local_interv:
         vals.append(r1_func(point))
 
-    r1 = l1 - f(num)
+    r1 = f(num) - l1
 
     r1_min = min(vals)
     r1_max = max(vals)
@@ -83,7 +87,7 @@ for num in nums:
 
     r2_func = lambdify(
         x,
-        expr=(1 / 6 * dif(f(x), 3))
+        expr=(1 / 6 * diff(f(x), x, 3))
         * ((num - prev[1]) * (num - cur[1]) * (num - next[1])),
     )
 
@@ -93,7 +97,7 @@ for num in nums:
     for point in local_interv:
         vals.append(r2_func(point))
 
-    r2 = l2 - f(num)
+    r2 = f(num) - l2
 
     r2_min = min(vals)
     r2_max = max(vals)
@@ -129,10 +133,6 @@ for num in nums:
 
     num_res = {num: {"l1": l1, "r1": r1, "n1": n1, "l2": l2, "r2": r2, "n2": n2}}
 
-    print()
-
-    print(num_res)
-
     result.append(num_res)
 
-    print("---------")
+    print("\n", num_res, "\n" + "---------")
