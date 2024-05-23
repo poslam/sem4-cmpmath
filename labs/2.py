@@ -142,7 +142,6 @@ h = (b - a) / 10
 xi = [(a + i * h) for i in range(11)]
 x_star = [0.42, 0.84, 0.56, 0.675]
 
-# Определение близжайшей точки к x*
 left_index = binSearch(x_star[2], xi)
 right_index = left_index + 1
 
@@ -151,31 +150,30 @@ if abs(xi[left_index] - x_star[2]) < abs(xi[right_index] - x_star[2]):
 else:
     x0 = xi[right_index]
 
-# Определение параметра t, трансформирование массива для разностей только вперед для x**
 t1 = t_search(x_star[0], xi[0], h)
 xs1 = array_transform(x_star[0], xi)
 list_of_functions1 = [fn(xs1[i]) for i in range(len(xs1))]
 
+print("n1", "\n")
 print(newtone_1(list_of_functions1, t1))
-print(fn(x_star[0]))
+print(fn(x_star[0]), "\n")
 
-# Определение параметра t, трансформирование массива для разностей только вперед для x***
 t2 = t_search(x_star[1], xi[-1], h)
 xs2 = array_transform(x_star[1], xi)
 list_of_functions2 = [fn(xs2[i]) for i in range(len(xs2))]
 
+print("n2", "\n")
 print(newtone_2(list_of_functions2, t2))
-print(fn(x_star[1]))
+print(fn(x_star[1]), "\n")
 
-# Определение параметра t, трансформирование массива для разностей только вперед для x****
 t3 = t_search(x_star[2], x0, h)
 xs3 = array_transform(x_star[2], xi)
 list_of_functions3 = [fn(xs3[i]) for i in range(len(xs3))]
 
+print("g1", "\n")
 print(gauss_1(list_of_functions3, t3))
-print(fn(x_star[2]))
+print(fn(x_star[2]), "\n")
 
-# Определение параметра t, трансформирование массива для разностей только вперед для x*****
 left_index1 = binSearch(x_star[3], xi)
 right_index1 = left_index1 + 1
 
@@ -188,5 +186,6 @@ t4 = t_search(x_star[3], x1, h)
 xs4 = array_transform(x_star[3], xi)
 list_of_functions4 = [fn(xs4[i]) for i in range(len(xs4))]
 
+print("g2", "\n")
 print(gauss_2(list_of_functions4, t4))
-print(fn(x_star[3]))
+print(fn(x_star[3]), "\n")

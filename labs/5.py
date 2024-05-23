@@ -12,10 +12,9 @@ def solver(a: list, b: list, c: list, f: list) -> list:
     return x[::-1]
 
 
-if __name__ == "__main__":
-    a = [0, -1, 7, 4, -5]
-    b = [8, 5, -5, 7, 8]
-    c = [-2, 3, -9, 9, 0]
-    f = [-7, 6, 9, -8, 5]
+a = [0, -1, 7, 4, -5]
+b = [8, 5, -5, 7, 8]
+c = [-2, 3, -9, 9, 0]
+f = [-7, 6, 9, -8, 5]
 
-    print(solver(a, b, c, f))
+print(solver(a, b, c, f))
